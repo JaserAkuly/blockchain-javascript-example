@@ -20,32 +20,55 @@ class Block {
     calculateHash() {
         return SHA256(this.index + this.previousHash + this.timestamp + JSON.stringify(this.data)).toString();
     }
-    
+
 }
 
 class Blockchain {
-    constructor () {
+    constructor() {
         this.chain = [this.createGenesisBlock()];
     }
 
-    createGenesisBlock(){
+    createGenesisBlock() {
         return new Block(0, "10/29/2017", "Genesis Block", "0")
     }
 
     getLatestBlock() {
-        return this.chain[this.chain.length -1];
+        return this.chain[this.chain.length - 1];
     }
 
-    addBlock (newBlock) {
+    addBlock(newBlock) {
         newBlock.previousHash = this.getLatestBlock().hash;
         newBlock.hash = newBlock.calculateHash();
         this.chain.push(newBlock);
     }
+
+    isChainValid() {
+        for (let i = 1; i < this.chain.length; i++) {
+            const currentBlock = this.chain[i];
+            const previousBlock = this.chain[i - 1];
+
+            if (currentBlock.hash !== currentBlock.calculateHash()) {
+                return false;
+            }
+
+            if (currentBlock.previousHash !== previousBlock.hash) {
+                return false;
+            }
+        }
+
+        return true;
+    }
 }
 
 let jAkulyCoin = new Blockchain();
-jAkulyCoin.addBlock(new Block(1, "10/30/2017", {amount: 4}));
-jAkulyCoin.addBlock(new Block(2, "10/31/2017", {amount: 14}));
-jAkulyCoin.addBlock(new Block(3, "11/01/2017", {amount: 24}));
+jAkulyCoin.addBlock(new Block(1, "10/30/2017", { amount: 4 }));
+jAkulyCoin.addBlock(new Block(2, "10/31/2017", { amount: 14 }));
+jAkulyCoin.addBlock(new Block(3, "11/01/2017", { amount: 24 }));
 
-console.log(JSON.stringify(jAkulyCoin, null, 2));
+console.log('Is The JAkuly Valid? ' + jAkulyCoin.isChainValid());
+
+jAkulyCoin.chain[1].data = {amount: 100};
+jAkulyCoin.chain[1].hash = jAkulyCoin.chain[1].calculateHash();
+
+console.log('Is The JAkuly Valid? ' + jAkulyCoin.isChainValid());
+// console.log(JSON.stringify(jAkulyCoin, null, 2));
