@@ -14,7 +14,7 @@ class Block {
         this.timestamp = timestamp;
         this.data = data;
         this.previousHash = previousHash;
-        this.has = this.calculateHash();
+        this.hash = this.calculateHash();
     }
 
     calculateHash() {
@@ -25,7 +25,7 @@ class Block {
 
 class Blockchain {
     constructor () {
-        this.chain = [];
+        this.chain = [this.createGenesisBlock()];
     }
 
     createGenesisBlock(){
@@ -42,3 +42,10 @@ class Blockchain {
         this.chain.push(newBlock);
     }
 }
+
+let jAkulyCoin = new Blockchain();
+jAkulyCoin.addBlock(new Block(1, "10/30/2017", {amount: 4}));
+jAkulyCoin.addBlock(new Block(2, "10/31/2017", {amount: 14}));
+jAkulyCoin.addBlock(new Block(3, "11/01/2017", {amount: 24}));
+
+console.log(JSON.stringify(jAkulyCoin, null, 2));
