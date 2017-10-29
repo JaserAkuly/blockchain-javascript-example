@@ -15,17 +15,29 @@ class Block {
         this.data = data;
         this.previousHash = previousHash;
         this.hash = this.calculateHash();
+        this.nonce = 0;
     }
 
     calculateHash() {
-        return SHA256(this.index + this.previousHash + this.timestamp + JSON.stringify(this.data)).toString();
+        return SHA256(this.index + this.previousHash + this.timestamp + JSON.stringify(this.data) + this.nonce).toString();
     }
 
+    mineBlock(difficulty){
+        while(this.hash.substring(0, difficulty) !== Array(difficulty + 1).join("0")) {
+            this.nonce++;
+            this.hash = this.calculateHash();
+        }
+
+        console.log("Blocked Minted: " + this.hash);
+    }
 }
+
+
 
 class Blockchain {
     constructor() {
         this.chain = [this.createGenesisBlock()];
+        this.difficulty = 5
     }
 
     createGenesisBlock() {
@@ -38,7 +50,7 @@ class Blockchain {
 
     addBlock(newBlock) {
         newBlock.previousHash = this.getLatestBlock().hash;
-        newBlock.hash = newBlock.calculateHash();
+        newBlock.mineBlock(this.difficulty)
         this.chain.push(newBlock);
     }
 
@@ -61,14 +73,11 @@ class Blockchain {
 }
 
 let jAkulyCoin = new Blockchain();
+
+
+console.log('Mining Block 1...')
 jAkulyCoin.addBlock(new Block(1, "10/30/2017", { amount: 4 }));
+console.log('Mining Block 2...')
 jAkulyCoin.addBlock(new Block(2, "10/31/2017", { amount: 14 }));
+console.log('Mining Block 3...')
 jAkulyCoin.addBlock(new Block(3, "11/01/2017", { amount: 24 }));
-
-console.log('Is The JAkuly Valid? ' + jAkulyCoin.isChainValid());
-
-jAkulyCoin.chain[1].data = {amount: 100};
-jAkulyCoin.chain[1].hash = jAkulyCoin.chain[1].calculateHash();
-
-console.log('Is The JAkuly Valid? ' + jAkulyCoin.isChainValid());
-// console.log(JSON.stringify(jAkulyCoin, null, 2));
